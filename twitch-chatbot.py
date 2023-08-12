@@ -1,17 +1,24 @@
 from lib import twitch_chat_irc
+from datetime import datetime
 
+# Constants
 TWITCH_CHANNEL_NAME = 'stellaric'
-print(twitch_chat_irc)
 
-print("Connecting to Twitch")
-connection = twitch_chat_irc.TwitchChatIRC()
+connection = None
 
-print("Sending message")
-message = 'Hello world!'
-connection.send(TWITCH_CHANNEL_NAME, message)
+def twitch_connect():
+    print("Connecting & Logging in to Twitch")
+    connection = twitch_chat_irc.TwitchChatIRC()
 
-def do_something(message):
-	print(f"Received: {message}")
+twitch_connect()
 
-connection.listen(TWITCH_CHANNEL_NAME, on_message=do_something)
+def twitch_send_message(message):
+    connection.send(TWITCH_CHANNEL_NAME, message)
 
+def twitch_on_receive_message(message_data):
+	print(f"{datetime.now()} - {message_data['display-name']}: {message_data['message']}")
+
+print(f"\nListening for messages in channel `{TWITCH_CHANNEL_NAME}`\n")
+connection.listen(TWITCH_CHANNEL_NAME, on_message=twitch_on_receive_message)
+
+connection.close()
